@@ -15,15 +15,24 @@ function registerTopicFooterButtons(api, container, siteSettings) {
     label() {
       return "private_replies.button.private_replies.button";
     },
-    action() {
-      // Get topic owner's email or use a default
+    async action() {
       const topicOwner = this.get("topic.details.created_by");
-      const email = topicOwner?.email || "someone@example.com";
-      const subject = `Re: ${this.get("topic.title")}`;
       
-      // Open Gmail with mailto link
-      const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
-      window.open(mailtoLink, '_blank');
+      try {
+        // Fetch user details including email via API
+        const userDetails = await ajax(`/u/${topicOwner.username}.json`);
+        const email = userDetails.user?.email || "someone@example.com";
+        
+        const subject = `Re: ${this.get("topic.title")}`;
+        const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+        window.open(mailtoLink, '_blank');
+      } catch (error) {
+        popupAjaxError(error);
+        // Fallback to default email if API call fails
+        const subject = `Re: ${this.get("topic.title")}`;
+        const mailtoLink = `mailto:someone@example.com?subject=${encodeURIComponent(subject)}`;
+        window.open(mailtoLink, '_blank');
+      }
     },
     dropdown() {
       return this.site.mobileView;
