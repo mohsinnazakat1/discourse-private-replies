@@ -1,6 +1,7 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import I18n from "discourse-i18n";  // Import I18n if needed for custom titles, but use keys directly
 
 function registerTopicFooterButtons(api, container, siteSettings) {
   api.registerTopicFooterButton({
@@ -8,12 +9,12 @@ function registerTopicFooterButtons(api, container, siteSettings) {
     icon() {
       return "reply";
     },
-    priority: 250,
+    priority: 250,  // Or increase to 300+ if you want it at the very end
     title() {
-      return "Reply to this topic";
+      return "topic.reply.help";  // Matches default i18n key for tooltip
     },
     label() {
-      return "Reply";
+      return "topic.reply.title";  // Matches default i18n key for "Reply" text
     },
     async action() {
       const topicOwner = this.get("topic.details.created_by");
@@ -35,11 +36,11 @@ function registerTopicFooterButtons(api, container, siteSettings) {
       }
     },
     dropdown() {
-      return this.site.mobileView;
+      return false;  // Always inline, like the default reply button
     },
-    classNames: ["btn-primary"],
+    classNames: ["btn-primary", "create", "topic-footer-button"],  // Exact classes from default
     displayed() {
-      // Show email button for all logged-in users
+      // Show button for all logged-in users
       return this.currentUser;
     }
   });
@@ -56,16 +57,16 @@ export default {
     withPluginApi("0.8.28", api => {
       registerTopicFooterButtons(api, container, siteSettings);
       api.onPageChange(() => {
-        // Hide the main Reply button at the bottom of topics
+        // Hide the main Reply button in the timeline (secondary button)
         const replyButton = document.querySelector('.timeline-container .topic-timeline .reply-to-post');
         if (replyButton) {
           replyButton.style.display = 'none';
         }
         
-        // Hide Reply buttons in the topic controls
+        // Hide default Reply buttons in the topic controls, but skip the plugin button
         const topicReplyButtons = document.querySelectorAll('.topic-footer-main-buttons .btn-primary');
         topicReplyButtons.forEach(button => {
-          if (button.textContent.trim().includes('Reply')) {
+          if (button.textContent.trim().includes('Reply') && button.id !== 'privatereplies') {
             button.style.display = 'none';
           }
         });
