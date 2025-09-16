@@ -53,6 +53,23 @@ export default {
       return;
     }
 
-    withPluginApi("0.8.28", api => registerTopicFooterButtons(api, container, siteSettings));
+    withPluginApi("0.8.28", api => {
+      registerTopicFooterButtons(api, container, siteSettings);
+      api.onPageChange(() => {
+        // Hide the main Reply button at the bottom of topics
+        const replyButton = document.querySelector('.timeline-container .topic-timeline .reply-to-post');
+        if (replyButton) {
+          replyButton.style.display = 'none';
+        }
+        
+        // Hide Reply buttons in the topic controls
+        const topicReplyButtons = document.querySelectorAll('.topic-footer-main-buttons .btn-primary');
+        topicReplyButtons.forEach(button => {
+          if (button.textContent.trim().includes('Reply')) {
+            button.style.display = 'none';
+          }
+        });
+      });
+    });
   }
 };
