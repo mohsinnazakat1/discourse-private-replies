@@ -6,14 +6,14 @@ function registerTopicFooterButtons(api, container, siteSettings) {
   api.registerTopicFooterButton({
     id: "privatereplies",
     icon() {
-      return "envelope";
+      return "reply";
     },
     priority: 250,
     title() {
-      return "private_replies.button.private_replies.help";
+      return "Reply to this topic";
     },
     label() {
-      return "private_replies.button.private_replies.button";
+      return "Reply";
     },
     async action() {
       const topicOwner = this.get("topic.details.created_by");
@@ -37,7 +37,7 @@ function registerTopicFooterButtons(api, container, siteSettings) {
     dropdown() {
       return this.site.mobileView;
     },
-    classNames: ["private-replies"],
+    classNames: ["btn-primary"],
     displayed() {
       // Show email button for all logged-in users
       return this.currentUser;
